@@ -1,0 +1,5 @@
+// "/home"
+// "/workoutTracking"
+// "/exerciseLibrary"
+// "/goalSetting"
+// "/about"
