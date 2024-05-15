@@ -11,7 +11,7 @@ router.get("/workoutTracking", async (req, res) => {
     // Fetch all exercises from the Workout model
     const goalExercises = await Workout.find({ type_: "goal" }); // Assuming you want only goal exercises
     res.status(200).json(goalExercises);
-    console.log(goalExercises);
+    //console.log(goalExercises);
   } catch (error) {
     console.error("Error fetching workout data:", error);
     res.status(500).json({ message: "Internal server error" });
