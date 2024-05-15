@@ -8,6 +8,7 @@ const WorkoutTracking = () => {
   const [currentDay, setCurrentDay] = useState("");
 
   useEffect(() => {
+    
     const fetchExercises = async () => {
       try {
         const response = await axios.get(
