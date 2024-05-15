@@ -7,13 +7,19 @@ const AddExerciseData = ({ onClose, dayOfWeek }) => {
   const [sets, setSets] = useState("");
   const [reps, setReps] = useState("");
 
-  const handleSubmit = () => {
-    // Here you can send the data to MongoDB
-    // For now, let's just show an alert
-    alert("Data added successfully");
-    onClose(); // Close the form
-  };
+  const isFormFilled = exercise !== "" && weight !== "" && sets !== "" && reps !== "";
 
+  const handleSubmit = () => {
+    if (isFormFilled) {
+      // Here you can send the data to MongoDB
+      alert("Data added successfully");
+      onClose(); // Close the form
+    } else {
+      alert("Please fill all fields");
+    }
+
+  };
+  
   return (
     <Card>
       <CardContent>

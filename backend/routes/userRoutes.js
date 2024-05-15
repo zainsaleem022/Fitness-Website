@@ -24,8 +24,10 @@ router.get("/about", (req, res) => {
 router.post("/workoutTracking/add", (req, res) => {
   const { exercise, weight, sets, reps, dayOfWeek } = req.body;
   // Here you would typically add the workout data to your database
-  workouts.push({ exercise, weight, sets, reps, dayOfWeek });
+  workouts.push({exercise, weight, sets, reps, dayOfWeek });
   res.send("Workout added successfully.");
 });
+
+
 
 module.exports = router;
