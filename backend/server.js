@@ -5,8 +5,7 @@ const {
 } = require("./middleware/errorHandlerMiddleware");
 const userRoutes = require("./routes/userRoutes");
 const { connectDB } = require("./database");
-const Workout = require("./models/WorkOutModel"); // Import the Workout model
-
+const cors = require("cors");
 // Load environment variables from .env file
 require("dotenv").config();
 // Connect to MongoDB
@@ -14,6 +13,7 @@ connectDB();
 
 const app = express();
 const PORT = process.env.PORT || 5000;
+app.use(cors());
 
 // Middleware
 app.use(express.json()); //to accept JSON data

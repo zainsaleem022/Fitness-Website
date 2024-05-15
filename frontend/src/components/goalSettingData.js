@@ -17,11 +17,11 @@ const GoalSettingData = ({ day }) => {
 
   return (
     <div>
-      <h3>{day}</h3>
-      <Button onClick={handleAddClick}>Add</Button>
-      {showForm && (
-        <AddExerciseData onClose={handleCloseForm} dayOfWeek={day} />
-      )}
+      <div style={{ display: "flex", alignItems: "center" }}>
+        <h3 style={{ marginRight: "1rem" }}>{day}</h3>
+        <Button onClick={handleAddClick}>Add</Button>
+      </div>
+      {showForm && <AddExerciseData onClose={handleCloseForm} dayOfWeek={day} />}
     </div>
   );
 };
