@@ -11,7 +11,7 @@ import {
   Avatar,
 } from "@mui/material";
 import { linearProgressClasses } from "@mui/material";
-import exTrackingIcon from "../assets/icons/exTrackingIcon.png";
+import exTrackingIcon from "../assets/icons/exercise.png";
 
 const BorderLinearProgress = styled(LinearProgress)(({ theme }) => ({
   height: 10,
@@ -26,7 +26,7 @@ const BorderLinearProgress = styled(LinearProgress)(({ theme }) => ({
   },
 }));
 
-const GoalExerciseCard = ({ exercise }) => {
+const GoalExerciseCard = ({ exercise, handleChildData }) => {
   const [trackingSets, setTrackingSets] = useState(0);
   const [weight, setWeight] = useState("");
   const [reps, setReps] = useState("");
@@ -36,6 +36,18 @@ const GoalExerciseCard = ({ exercise }) => {
     const totalWeight = parseInt(reps) * parseInt(weight) || 0;
     setTotalWeightLifted(totalWeightLifted + totalWeight);
   }, [trackingSets]);
+
+  useEffect(() => {
+    const data = {
+      exercise: exercise.exercise, // Exercise name
+      weight: totalWeightLifted, // Weight
+      sets: trackingSets, // Tracking sets
+      reps: reps, // Reps from exercise object
+      dayOfWeek: exercise.dayOfWeek, // Day of the week from exercise object
+      type_: "track", // Type of exercise
+    };
+    handleChildData(data);
+  }, [trackingSets, totalWeightLifted, reps]);
 
   const handleIncrementSets = () => {
     if (weight.trim() === "" || reps.trim() === "") {
