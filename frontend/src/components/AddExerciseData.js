@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import { TextField, Button, Card, CardContent } from "@mui/material";
+import { TextField, Button, Card, CardContent} from "@mui/material";
 
-const AddExerciseData = ({ onClose, dayOfWeek, onAdd }) => {
+  const AddExerciseData = ({ onClose, dayOfWeek, onAdd, existingExercises }) => {
   const [exercise, setExercise] = useState("");
   const [weight, setWeight] = useState("");
   const [sets, setSets] = useState("");
@@ -10,7 +10,15 @@ const AddExerciseData = ({ onClose, dayOfWeek, onAdd }) => {
   const isFormFilled = exercise !== "" && weight !== "" && sets !== "" && reps !== "";
 
   const handleSubmit = async () => {
+
     if (isFormFilled) {
+
+      const exerciseExists = existingExercises.some(ex => ex.exercise.trim().toLowerCase() === exercise.trim().toLowerCase());
+      if (exerciseExists) {
+
+        alert("Exercise with the same name already exists for this day.");
+        return;
+      }
       try {
         const response = await fetch("http://localhost:5000/bfit/goalSetting", {
           method: "POST",
@@ -43,7 +51,7 @@ const AddExerciseData = ({ onClose, dayOfWeek, onAdd }) => {
     }
 
   };
-
+  
   return (
     <Card>
       <CardContent>

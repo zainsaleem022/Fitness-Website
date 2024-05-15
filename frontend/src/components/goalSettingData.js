@@ -58,11 +58,11 @@ const GoalSettingData = ({ day }) => {
         <h3 style={{ marginRight: "1rem" }}>{day}</h3>
         <Button onClick={handleAddClick}>Add</Button>
       </div>
-      {showForm && <AddExerciseData onClose={handleCloseForm} dayOfWeek={day} onAdd={handleAdd} />}
+      {showForm && <AddExerciseData onClose={handleCloseForm} dayOfWeek={day} onAdd={handleAdd} existingExercises={exercisesForDay} />}
       {exercisesForDay.length > 0 && (
         <div>
           {exercisesForDay.map((exercise, index) => (
-            <ExerciseEntry key={index} exercise={exercise} 
+            <ExerciseEntry key={index} exercise={exercise} existingExercises={exercisesForDay}
             onDelete={handleDelete} 
             onUpdate={handleUpdate} />
           ))}
