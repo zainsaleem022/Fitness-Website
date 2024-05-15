@@ -5,7 +5,7 @@ import CssBaseline from "@mui/material/CssBaseline";
 import theme from "./components/theme"; // Import your custom theme
 import BfitNavbar from "./components/Navbar";
 import HomePage from "./pages/HomePage";
-import ExerciseLibraryPage from "./pages/excerciselibrarypage"; // Ensure this path is correct
+import ExerciseLibraryPage from "./pages/ExerciseLibraryPage"; // Ensure this path is correct
 import GoalSettingPage from "./pages/GoalSettingPage";
 import WorkoutTrackingPage from "./pages/WorkoutTrackingPage";
 import AboutUsPage from "./pages/AboutUsPage";
