@@ -74,7 +74,7 @@ app.use(express.json()); //to accept JSON data
 // insertDummyData();
 
 // Routes
-app.use("/gfit", userRoutes);
+app.use("/bfit", userRoutes);
 
 // Error handling middleware
 //app.use(notFound);
