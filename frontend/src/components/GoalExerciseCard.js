@@ -10,6 +10,7 @@ import {
   LinearProgress,
   Avatar,
 } from "@mui/material";
+import axios from "axios";
 import { linearProgressClasses } from "@mui/material";
 import exTrackingIcon from "../assets/icons/exercise.png";
 
@@ -26,11 +27,18 @@ const BorderLinearProgress = styled(LinearProgress)(({ theme }) => ({
   },
 }));
 
-const GoalExerciseCard = ({ exercise, handleChildData }) => {
+const GoalExerciseCard = ({
+  exercise,
+  trackedExercises,
+  setTrackedExercises,
+  alreadyTrackedExercises,
+}) => {
   const [trackingSets, setTrackingSets] = useState(0);
   const [weight, setWeight] = useState("");
   const [reps, setReps] = useState("");
   const [totalWeightLifted, setTotalWeightLifted] = useState(0);
+  const [newTrackedExercises, setNewTrackedExercises] = useState([]);
+  const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
     const totalWeight = parseInt(reps) * parseInt(weight) || 0;
@@ -38,6 +46,20 @@ const GoalExerciseCard = ({ exercise, handleChildData }) => {
   }, [trackingSets]);
 
   useEffect(() => {
+    const trackedExercise = alreadyTrackedExercises.find(
+      (trackedExercise) => trackedExercise.exercise === exercise.exercise
+    );
+
+    if (trackedExercise && !loaded) {
+      setTrackingSets(trackedExercise.sets || 0);
+      setWeight(trackedExercise.weight || "");
+      setReps(trackedExercise.reps || "");
+      setTotalWeightLifted(trackedExercise.weight || 0);
+      setLoaded(true);
+    }
+  }, [alreadyTrackedExercises]); // Empty dependency array ensures this effect runs only once
+
+  const handleSaveProgress = async () => {
     const data = {
       exercise: exercise.exercise, // Exercise name
       weight: totalWeightLifted, // Weight
@@ -46,8 +68,17 @@ const GoalExerciseCard = ({ exercise, handleChildData }) => {
       dayOfWeek: exercise.dayOfWeek, // Day of the week from exercise object
       type_: "track", // Type of exercise
     };
-    handleChildData(data);
-  }, [trackingSets, totalWeightLifted, reps]);
+
+    try {
+      // Send a POST request with the exercise data
+      await axios.post("http://localhost:5000/bfit/workoutTracking", {
+        trackedExercise: data, // Send data of the single exercise
+      });
+      console.log("Progress saved successfully!");
+    } catch (error) {
+      console.error("Error saving progress:", error);
+    }
+  };
 
   const handleIncrementSets = () => {
     if (weight.trim() === "" || reps.trim() === "") {
@@ -173,14 +204,31 @@ const GoalExerciseCard = ({ exercise, handleChildData }) => {
         <Stack spacing={2} sx={{ flexGrow: 1 }}>
           <BorderLinearProgress variant="determinate" value={progress} />
         </Stack>
-        <Button
-          variant="outlined"
-          color="error"
-          style={{ marginTop: "1rem" }} // Set text color to black
-          onClick={handleReset}
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center", // Fix typo: use "justifyContent" instead of "justifyItems"
+            marginBottom: "1rem", // Add margin bottom to create space between elements
+          }}
         >
-          Reset
-        </Button>
+          <Button
+            variant="outlined"
+            color="error"
+            style={{ margin: "0.5rem" }} // Set margin to create space around the button
+            onClick={handleReset}
+          >
+            Reset
+          </Button>
+          <Button
+            variant="contained"
+            color="primary"
+            style={{ margin: "0.5rem" }} // Set margin to create space around the button
+            onClick={handleSaveProgress}
+          >
+            Save Progress
+          </Button>
+        </div>
       </CardContent>
     </Card>
   );

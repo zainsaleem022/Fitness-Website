@@ -7,62 +7,23 @@ import exTrackingIcon from "../assets/icons/exTrackingIcon.png";
 const WorkoutTracking = () => {
   const [goalExercises, setGoalExercises] = useState([]);
   const [currentDay, setCurrentDay] = useState("");
-  const [childData, setChildData] = useState([]);
   const [trackedExercises, setTrackedExercises] = useState([]);
+  const [alreadyTrackedExercises, setAlreadyTrackedExercises] = useState([]);
 
   useEffect(() => {
     const fetchExercises = async () => {
       try {
         const response = await axios.get(
           "http://localhost:5000/bfit/workoutTracking"
-        ); // Adjust the endpoint accordingly
+        );
         setGoalExercises(response.data); // Assuming response.data is an array of exercises
         setCurrentDay(getCurrentDay()); // Set the current day
       } catch (error) {
         console.error("Error fetching exercises:", error);
       }
     };
-
     fetchExercises();
   }, []);
-
-  const handleSaveProgress = async () => {
-    // Filter trackedExercises to only include exercises with type_ as "track"
-    const filteredExercises = trackedExercises.filter(
-      (exercise) => exercise.type_ === "track"
-    );
-
-    try {
-      // Send a POST request with the filtered trackedExercises data
-      await axios.post("http://localhost:5000/bfit/workoutTracking", {
-        trackedExercises: filteredExercises,
-      });
-      console.log("Progress saved successfully!");
-    } catch (error) {
-      console.error("Error saving progress:", error);
-    }
-  };
-
-  const handleChildData = (data) => {
-    console.log(data.exercise);
-    var newReps = parseInt(data.reps);
-    const updatedTrackedExercises = trackedExercises.map((exercise) => {
-      if (exercise.exercise === data.exercise) {
-        return {
-          ...exercise,
-          sets: data.sets,
-          reps: newReps,
-          weight: data.weight,
-          type_: "track",
-        };
-      }
-      return exercise; // Return the original exercise if no match
-    });
-
-    console.log(updatedTrackedExercises);
-
-    setTrackedExercises(updatedTrackedExercises); // Update the trackedExercises state
-  };
 
   const getCurrentDay = () => {
     const daysOfWeek = [
@@ -79,13 +40,20 @@ const WorkoutTracking = () => {
     return daysOfWeek[currentDayIndex];
   };
 
-  const exercisesOfDay = goalExercises.filter(
-    (exercise) => exercise.dayOfWeek === currentDay
-  );
+  const exercisesOfDay = goalExercises.filter((exercise) => {
+    // Filter by dayOfWeek and ensure type_ is not "track"
+    return exercise.dayOfWeek === currentDay && exercise.type_ !== "track";
+  });
+
+  const alreadyTrackedEx = goalExercises.filter((exercise) => {
+    // Filter by dayOfWeek and ensure type_ is not "goal"
+    return exercise.dayOfWeek === currentDay && exercise.type_ !== "goal";
+  });
 
   useEffect(() => {
     // Update trackedExercises when exercisesOfDay changes
     setTrackedExercises(exercisesOfDay);
+    setAlreadyTrackedExercises(alreadyTrackedEx);
   }, [exercisesOfDay]);
 
   return (
@@ -126,21 +94,21 @@ const WorkoutTracking = () => {
       <Typography variant="h6" gutterBottom>
         Exercises:
       </Typography>
-      {exercisesOfDay.map((exercise, index) => (
-        <GoalExerciseCard
-          key={index}
-          exercise={exercise}
-          handleChildData={handleChildData}
-        />
-      ))}
-      <Button
-        variant="contained"
-        color="primary"
-        onClick={handleSaveProgress}
-        style={{ marginTop: "3rem" }}
-      >
-        Save Progress
-      </Button>
+      {exercisesOfDay.length === 0 ? (
+        <Typography variant="body1" gutterBottom>
+          No Exercises Set Added for Today
+        </Typography>
+      ) : (
+        exercisesOfDay.map((exercise, index) => (
+          <GoalExerciseCard
+            key={index}
+            exercise={exercise}
+            trackedExercises={trackedExercises}
+            setTrackedExercises={setTrackedExercises}
+            alreadyTrackedExercises={alreadyTrackedExercises}
+          />
+        ))
+      )}
     </div>
   );
 };
