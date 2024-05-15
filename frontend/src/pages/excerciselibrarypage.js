@@ -1,7 +1,7 @@
 import React from "react";
 import ExerciseLibrary from "../components/ExerciseLibrary"; // Adjust the import path as needed
 
-const ExercisePage = () => {
+const ExerciseLibraryPage = () => {
   return (
     <div>
       <ExerciseLibrary />
@@ -9,4 +9,4 @@ const ExercisePage = () => {
   );
 };
 
-export default ExercisePage;
+export default ExerciseLibraryPage;
