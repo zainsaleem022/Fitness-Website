@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { TextField, Button, Card, CardContent } from "@mui/material";
 
-const AddExerciseData = ({ onClose, dayOfWeek }) => {
+const AddExerciseData = ({ onClose, dayOfWeek, onAdd }) => {
   const [exercise, setExercise] = useState("");
   const [weight, setWeight] = useState("");
   const [sets, setSets] = useState("");
@@ -9,17 +9,41 @@ const AddExerciseData = ({ onClose, dayOfWeek }) => {
 
   const isFormFilled = exercise !== "" && weight !== "" && sets !== "" && reps !== "";
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (isFormFilled) {
-      // Here you can send the data to MongoDB
-      alert("Data added successfully");
-      onClose(); // Close the form
+      try {
+        const response = await fetch("http://localhost:5000/bfit/goalSetting", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            exercise,
+            weight,
+            sets,
+            reps,
+            dayOfWeek,
+          }),
+        });
+        if (response.ok) {
+          // Data added successfully
+          alert("Data added successfully");
+          onAdd();
+          onClose(); // Close the form
+        } else {
+          // Error occurred while adding data
+          alert("Error adding data. Please try again.");
+        }
+      } catch (error) {
+        console.error("Error:", error);
+        alert("An error occurred. Please try again later.");
+      }
     } else {
       alert("Please fill all fields");
     }
 
   };
-  
+
   return (
     <Card>
       <CardContent>
