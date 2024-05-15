@@ -6,7 +6,7 @@ const theme = createTheme({
       main: "#ff9800", // Lighter orange color
     },
     background: {
-      default: "#121212", // Dark background
+      default: "#000", // Dark background
       paper: "#1e1e1e", // Slightly lighter dark background for cards
     },
     text: {

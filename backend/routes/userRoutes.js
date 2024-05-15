@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
-const Workout = require("../models/WorkOutModel"); // Import the Workout model
+const Workout = require("../models/WorkOutModel");
+const ExcerciseLib=require("../models/ExcerciseLibraryModel") // Import the Workout model
 
 router.get("/", (req, res) => {
   res.send("Welcome to the home page!");
@@ -37,6 +38,36 @@ router.post("/workoutTracking/add", (req, res) => {
   res.send("Workout added successfully.");
 });
 
+router.post("/favorites", async (req, res) => {
+  try {
+    const exercise = new ExcerciseLib(req.body);
+    console.log(exercise);
+    await exercise.save();
+    res.status(201).send(exercise);
+  } catch (error) {
+    res.status(400).send(error);
+  }
+});
 
+// Get favorite exercises
+router.get("/favorites", async (req, res) => {
+  try {
+    const exercises = await ExcerciseLib.find();
+    res.status(200).send(exercises);
+  } catch (error) {
+    res.status(500).send(error);
+  }
+});
+
+router.delete("/favorites/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    await ExcerciseLib.findByIdAndDelete(id);
+    res.status(200).send({ message: "Exercise deleted successfully" });
+  } catch (error) {
+    console.error("Error deleting exercise:", error);
+    res.status(500).send({ message: "Internal server error" });
+  }
+});
 
 module.exports = router;
