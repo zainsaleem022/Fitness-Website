@@ -1,5 +1,8 @@
 import React from "react";
 import GoalSettingData from "../components/goalSettingData";
+import theme from "../components/theme";
+
+
 const GoalSetting = () => {
   return (
     <div>

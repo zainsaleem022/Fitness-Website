@@ -12,6 +12,7 @@ const WorkoutTracking = () => {
   const [goalExercises, setGoalExercises] = useState([]);
 
   useEffect(() => {
+    
     const fetchExercises = async () => {
       try {
         const response = await axios.get(
