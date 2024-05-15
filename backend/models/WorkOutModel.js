@@ -30,6 +30,11 @@ const workoutSchema = new mongoose.Schema({
     ],
     required: true,
   },
+  type_: {
+    type: String,
+    enum: ["goal", "track"],
+    required: true,
+  },
 });
 
 const Workout = mongoose.model("Workout", workoutSchema);
