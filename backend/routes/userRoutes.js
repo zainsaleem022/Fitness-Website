@@ -10,9 +10,8 @@ router.get("/", (req, res) => {
 router.get("/workoutTracking", async (req, res) => {
   try {
     // Fetch all exercises from the Workout model
-    const goalExercises = await Workout.find({ type_: "goal" }); // Assuming you want only goal exercises
-    res.status(200).json(goalExercises);
-    //console.log(goalExercises);
+    const allExercises = await Workout.find(); // Fetch all exercises
+    res.status(200).json(allExercises);
   } catch (error) {
     console.error("Error fetching workout data:", error);
     res.status(500).json({ message: "Internal server error" });
@@ -136,38 +135,35 @@ router.delete("/favorites/:id", async (req, res) => {
 
 // POST route to store or update exercise information
 router.post("/workoutTracking", async (req, res) => {
-  const { trackedExercises } = req.body;
-  console.log(trackedExercises);
-  console.log("found one");
+  const { trackedExercise } = req.body; // Get the single tracked exercise data
+  console.log(trackedExercise);
+
   try {
-    // Iterate over trackedExercises
-    for (const trackedExercise of trackedExercises) {
-      const { exercise, dayOfWeek, type_, ...exerciseData } = trackedExercise;
+    const { exercise, dayOfWeek, type_, ...exerciseData } = trackedExercise;
 
-      // Check if exercise exists with the same name, day, and type
-      const existingExercise = await Workout.findOneAndUpdate(
+    // Check if exercise exists with the same name, day, and type
+    const existingExercise = await Workout.findOneAndUpdate(
+      { exercise, dayOfWeek, type_ },
+      { $set: exerciseData },
+      { new: true }
+    );
+
+    if (existingExercise) {
+      // Update existing exercise with new data
+      console.log("Exercise already exists, updating...");
+      await Workout.updateOne(
         { exercise, dayOfWeek, type_ },
-        { $set: exerciseData },
-        { new: true }
+        { $set: exerciseData }
       );
-
-      if (existingExercise) {
-        console.log("yaaaaaaaaaao");
-        // Update existing exercise with new data
-        await Workout.updateOne(
-          { exercise, dayOfWeek, type_ },
-          { $set: exerciseData }
-        );
-      } else {
-        console.log("nooooooooooo");
-        // Create new exercise if it doesn't exist
-        await Workout.create({
-          exercise,
-          dayOfWeek,
-          type_,
-          ...exerciseData,
-        });
-      }
+    } else {
+      // Create new exercise if it doesn't exist
+      console.log("Exercise does not exist, creating...");
+      await Workout.create({
+        exercise,
+        dayOfWeek,
+        type_,
+        ...exerciseData,
+      });
     }
 
     res.status(200).json({ message: "Exercise data stored successfully." });
