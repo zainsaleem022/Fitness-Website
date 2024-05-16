@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { Typography, Button } from "@mui/material";
+import { Typography, Box } from "@mui/material";
 import GoalExerciseCard from "../components/GoalExerciseCard";
 import exTrackingIcon from "../assets/icons/exTrackingIcon.png";
 
@@ -57,37 +57,38 @@ const WorkoutTracking = () => {
   }, [exercisesOfDay]);
 
   return (
-    <div
-      style={{
-        // display: "flex",
-        // flexDirection: "column",
-        // width: "50%",
+    <Box
+      sx={{
         textAlign: "center",
-        // justify: "center",
         marginTop: "2rem",
+        padding: "1rem",
+        borderRadius: "8px",
+        boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
       }}
     >
-      <div
-        style={{
+      <Box
+        sx={{
           display: "flex",
           alignItems: "center",
-          justifyContent: "center", // Fix typo: use "justifyContent" instead of "justifyItems"
-          marginBottom: "1rem", // Add margin bottom to create space between elements
+          justifyContent: "center",
+          marginBottom: "1rem",
         }}
       >
         <img
           src={exTrackingIcon}
+          alt="Exercise Tracking Icon"
           style={{
             width: 100,
             height: 100,
             marginRight: 10,
             backgroundColor: "orange",
+            borderRadius: "50%",
           }}
         />
         <Typography variant="h4" gutterBottom>
           Track Your Workout
         </Typography>
-      </div>
+      </Box>
       <Typography variant="h6" gutterBottom>
         Day: {currentDay}
       </Typography>
@@ -99,17 +100,26 @@ const WorkoutTracking = () => {
           No Exercises Set Added for Today
         </Typography>
       ) : (
-        exercisesOfDay.map((exercise, index) => (
-          <GoalExerciseCard
-            key={index}
-            exercise={exercise}
-            trackedExercises={trackedExercises}
-            setTrackedExercises={setTrackedExercises}
-            alreadyTrackedExercises={alreadyTrackedExercises}
-          />
-        ))
+        <Box
+          sx={{
+            display: "flex",
+            flexWrap: "wrap",
+            justifyContent: "center",
+            gap: "1rem",
+          }}
+        >
+          {exercisesOfDay.map((exercise, index) => (
+            <GoalExerciseCard
+              key={index}
+              exercise={exercise}
+              trackedExercises={trackedExercises}
+              setTrackedExercises={setTrackedExercises}
+              alreadyTrackedExercises={alreadyTrackedExercises}
+            />
+          ))}
+        </Box>
       )}
-    </div>
+    </Box>
   );
 };
 

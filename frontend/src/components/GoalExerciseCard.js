@@ -52,8 +52,6 @@ const GoalExerciseCard = ({
 
     if (trackedExercise && !loaded) {
       setTrackingSets(trackedExercise.sets || 0);
-      setWeight(trackedExercise.weight || "");
-      setReps(trackedExercise.reps || "");
       setTotalWeightLifted(trackedExercise.weight || 0);
       setLoaded(true);
     }
@@ -131,21 +129,21 @@ const GoalExerciseCard = ({
         </div>
         <TextField
           name="sets"
-          label="Sets"
+          label="Goal Sets"
           value={exercise.sets}
           style={{ marginTop: "1rem" }}
           readOnly
         />
         <TextField
           name="reps"
-          label="Reps"
+          label="Goal Reps"
           value={exercise.reps}
           style={{ marginTop: "1rem" }}
           readOnly
         />
         <TextField
           name="weight"
-          label="Weight"
+          label="Goal Weight"
           style={{ marginTop: "1rem" }}
           value={exercise.weight}
           readOnly
