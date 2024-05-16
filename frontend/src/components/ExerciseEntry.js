@@ -1,13 +1,15 @@
 import React, { useState } from "react";
 import { Card, CardContent, Typography, TextField, Button } from "@mui/material";
 
-const ExerciseEntry = ({ exercise, onUpdate, onDelete }) => {
+const ExerciseEntry = ({ exercise, existingExercises, onUpdate, onDelete }) => {
   const [editedExercise, setEditedExercise] = useState({
     exercise: exercise.exercise,
     weight: exercise.weight.toString(),
     sets: exercise.sets.toString(),
     reps: exercise.reps.toString(),
   });
+
+  const isFormFilled = editedExercise.exercise.trim() !== "" && editedExercise.weight.trim() !== "" && editedExercise.sets.trim() !== "" && editedExercise.reps.trim() !== "";
 
   const handleChange = (event) => {
     const { name, value } = event.target;
@@ -18,6 +20,20 @@ const ExerciseEntry = ({ exercise, onUpdate, onDelete }) => {
   };
 
   const handleUpdate = async () => {
+
+
+    if (!isFormFilled) {
+        alert("Please fill all exercise fields");
+        return;
+      }
+
+    const exerciseExists = existingExercises.some(ex => ex.exercise.trim().toLowerCase() === editedExercise.exercise.trim().toLowerCase());
+    if (exerciseExists) {
+
+      alert("Exercise with the same name already exists for this day.");
+      return;
+    }
+
     try {
       const response = await fetch(`http://localhost:5000/bfit/goalSetting/${exercise._id}`, {
         method: "PUT",

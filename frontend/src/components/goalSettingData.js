@@ -49,6 +49,7 @@ const GoalSettingData = ({ day }) => {
   const handleAdd = () => {
     // Call fetchExerciseData to refresh the data after add
     fetchExerciseData();
+    setShowForm(false);
   };
 
   const handleDelete = () => {
@@ -76,29 +77,38 @@ const GoalSettingData = ({ day }) => {
           Add
         </Button>
       </Box>
-      <Dialog open={showForm} onClose={handleCloseForm}>
-        <DialogTitle>Add Exercise</DialogTitle>
+      <Dialog open={showForm} onClose={handleCloseForm} fullWidth maxWidth="sm">
+        <DialogTitle>Add Exercise Data</DialogTitle>
         <DialogContent>
           <AddExerciseData
             onClose={handleCloseForm}
             dayOfWeek={day}
             onAdd={handleAdd}
+            existingExercises={exercisesForDay}
           />
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleCloseForm} color="primary">
+          <Button
+            onClick={handleCloseForm}
+            sx={{
+              backgroundColor: "orange",
+              color: "white",
+              "&:hover": { backgroundColor: "darkorange" },
+            }}
+          >
             Cancel
           </Button>
         </DialogActions>
       </Dialog>
       {exercisesForDay.length > 0 ? (
-        <Grid container spacing={4}>
+        <Grid container spacing={4} style={{ marginTop: "1rem" }}>
           {exercisesForDay.map((exercise, index) => (
             <Grid item xs={12} sm={6} md={4} key={index}>
               <Card>
                 <CardContent>
                   <ExerciseEntry
                     exercise={exercise}
+                    existingExercises={exercisesForDay}
                     onDelete={handleDelete}
                     onUpdate={handleUpdate}
                   />
