@@ -10,8 +10,11 @@ import {
   Box,
   CardMedia,
   IconButton,
+  Tabs,
+  Tab,
 } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
+import RemoveIcon from "@mui/icons-material/Remove";
 import rickshaw from "../assets/images/rickshaw.jpeg";
 import singlelegpress from "../assets/images/singlelegpress.jpeg";
 import landmine from "../assets/images/landmine.jpeg";
@@ -62,6 +65,7 @@ const ExerciseLibrary = () => {
   const [exercises, setExercises] = useState([]);
   const [favorites, setFavorites] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
+  const [tabIndex, setTabIndex] = useState(0);
 
   useEffect(() => {
     const fetchExercises = async () => {
@@ -74,23 +78,180 @@ const ExerciseLibrary = () => {
             },
           }
         );
-        console.log(response.data); // Log the response data
         setExercises(response.data.slice(0, 10)); // Get at least 10 exercises
       } catch (error) {
         console.error("Error fetching exercises:", error);
       }
     };
 
+    const fetchFavorites = async () => {
+      try {
+        const response = await axios.get(
+          "http://localhost:5000/bfit/favorites"
+        );
+        setFavorites(response.data);
+      } catch (error) {
+        console.error("Error fetching favorites:", error);
+      }
+    };
+
     fetchExercises();
+    fetchFavorites();
   }, []);
 
-  const filteredExercises = exercises.filter((exercise) =>
-    exercise.name.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredExercises = exercises.filter(
+    (exercise) =>
+      exercise.name.toLowerCase().includes(searchTerm.toLowerCase()) &&
+      !favorites.some((fav) => fav.name === exercise.name)
   );
 
-  const handleAddToFavorites = (exercise) => {
-    setFavorites((prevFavorites) => [...prevFavorites, exercise]);
+  const handleAddToFavorites = async (exercise) => {
+    try {
+      const response = await axios.post(
+        "http://localhost:5000/bfit/favorites",
+        exercise
+      );
+      setFavorites((prevFavorites) => [...prevFavorites, response.data]);
+      setExercises((prevExercises) =>
+        prevExercises.filter((ex) => ex.name !== exercise.name)
+      );
+    } catch (error) {
+      console.error("Error adding to favorites:", error);
+    }
   };
+
+  const handleDeleteFromFavorites = async (id) => {
+    try {
+      const exerciseToRemove = favorites.find(
+        (exercise) => exercise._id === id
+      );
+      await axios.delete(`http://localhost:5000/bfit/favorites/${id}`);
+      setFavorites((prevFavorites) =>
+        prevFavorites.filter((exercise) => exercise._id !== id)
+      );
+      setExercises((prevExercises) => [...prevExercises, exerciseToRemove]);
+    } catch (error) {
+      console.error("Error deleting from favorites:", error);
+    }
+  };
+
+  const handleTabChange = (event, newValue) => {
+    setTabIndex(newValue);
+  };
+
+  const renderExerciseCard = (exercise, isFavorite = false) => (
+    <Grid item xs={12} sm={6} md={4} key={exercise._id || exercise.name}>
+      <Card>
+        <Box
+          sx={{
+            position: "relative",
+            paddingTop: "56.25%" /* 16:9 aspect ratio */,
+          }}
+        >
+          <CardMedia
+            component="img"
+            image={imageMap[exercise.name] || "https://via.placeholder.com/150"}
+            alt={exercise.name}
+            sx={{
+              position: "absolute",
+              top: 0,
+              left: 0,
+              width: "100%",
+              height: "100%",
+              objectFit: "cover",
+            }}
+          />
+        </Box>
+        <CardContent>
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+            }}
+          >
+            <Typography
+              variant="h6"
+              component="div"
+              gutterBottom
+              sx={{ fontWeight: "bold" }}
+            >
+              {truncateName(exercise.name)}
+            </Typography>
+            <IconButton
+              color="primary"
+              aria-label={
+                isFavorite ? "remove from favorites" : "add to favorites"
+              }
+              onClick={() =>
+                isFavorite
+                  ? handleDeleteFromFavorites(exercise._id)
+                  : handleAddToFavorites(exercise)
+              }
+              sx={{
+                "&:hover": {
+                  boxShadow: isFavorite
+                    ? "0 0 10px 2px rgba(255, 0, 0, 0.5)" // Red shadow for remove button on hover
+                    : "0 0 10px 2px rgba(0, 255, 0, 0.5)", // Green shadow for add button on hover
+                },
+              }}
+            >
+              {isFavorite ? <RemoveIcon /> : <AddIcon />}
+            </IconButton>
+          </Box>
+          <Grid container spacing={1}>
+            <Grid item xs={6}>
+              <Typography variant="body2" color="text.secondary" noWrap>
+                <Typography component="span" sx={{ fontWeight: "bold" }}>
+                  Type:
+                </Typography>{" "}
+                {exercise.type}
+              </Typography>
+            </Grid>
+            <Grid item xs={6}>
+              <Typography variant="body2" color="text.secondary" noWrap>
+                <Typography component="span" sx={{ fontWeight: "bold" }}>
+                  Muscle:
+                </Typography>{" "}
+                {exercise.muscle}
+              </Typography>
+            </Grid>
+            <Grid item xs={6}>
+              <Typography variant="body2" color="text.secondary" noWrap>
+                <Typography component="span" sx={{ fontWeight: "bold" }}>
+                  Equipment:
+                </Typography>{" "}
+                {exercise.equipment}
+              </Typography>
+            </Grid>
+            <Grid item xs={6}>
+              <Typography variant="body2" color="text.secondary" noWrap>
+                <Typography component="span" sx={{ fontWeight: "bold" }}>
+                  Difficulty:
+                </Typography>{" "}
+                <span
+                  style={{
+                    backgroundColor: getDifficultyColor(exercise.difficulty),
+                    color: "white",
+                    padding: "2px 4px",
+                    borderRadius: "4px",
+                  }}
+                >
+                  {formatDifficulty(exercise.difficulty)}
+                </span>
+              </Typography>
+            </Grid>
+          </Grid>
+          <Typography variant="body2" color="text.secondary" mt={1}>
+            <Typography component="span" sx={{ fontWeight: "bold" }}>
+              Instructions:
+            </Typography>{" "}
+            {exercise.instructions.split(". ")[0]}.
+          </Typography>
+        </CardContent>
+      </Card>
+    </Grid>
+  );
 
   return (
     <Container>
@@ -106,112 +267,14 @@ const ExerciseLibrary = () => {
           onChange={(e) => setSearchTerm(e.target.value)}
         />
       </Box>
+      <Tabs value={tabIndex} onChange={handleTabChange}>
+        <Tab label="All Exercises" />
+        <Tab label="Favorites" />
+      </Tabs>
       <Grid container spacing={4}>
-        {filteredExercises.map((exercise) => (
-          <Grid item xs={12} sm={6} md={4} key={exercise.name}>
-            <Card>
-              <Box
-                sx={{
-                  position: "relative",
-                  paddingTop: "56.25%" /* 16:9 aspect ratio */,
-                }}
-              >
-                <CardMedia
-                  component="img"
-                  image={
-                    imageMap[exercise.name] || "https://via.placeholder.com/150"
-                  }
-                  alt={exercise.name}
-                  sx={{
-                    position: "absolute",
-                    top: 0,
-                    left: 0,
-                    width: "100%",
-                    height: "100%",
-                    objectFit: "cover",
-                  }}
-                />
-              </Box>
-              <CardContent>
-                <Box
-                  sx={{
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                  }}
-                >
-                  <Typography
-                    variant="h6"
-                    component="div"
-                    gutterBottom
-                    sx={{ fontWeight: "bold" }}
-                  >
-                    {truncateName(exercise.name)}
-                  </Typography>
-                  <IconButton
-                    color="primary"
-                    aria-label="add to favorites"
-                    onClick={() => handleAddToFavorites(exercise)}
-                    sx={{ boxShadow: 3 }}
-                  >
-                    <AddIcon />
-                  </IconButton>
-                </Box>
-                <Grid container spacing={1}>
-                  <Grid item xs={6}>
-                    <Typography variant="body2" color="text.secondary" noWrap>
-                      <Typography component="span" sx={{ fontWeight: "bold" }}>
-                        Type:
-                      </Typography>{" "}
-                      {exercise.type}
-                    </Typography>
-                  </Grid>
-                  <Grid item xs={6}>
-                    <Typography variant="body2" color="text.secondary" noWrap>
-                      <Typography component="span" sx={{ fontWeight: "bold" }}>
-                        Muscle:
-                      </Typography>{" "}
-                      {exercise.muscle}
-                    </Typography>
-                  </Grid>
-                  <Grid item xs={6}>
-                    <Typography variant="body2" color="text.secondary" noWrap>
-                      <Typography component="span" sx={{ fontWeight: "bold" }}>
-                        Equipment:
-                      </Typography>{" "}
-                      {exercise.equipment}
-                    </Typography>
-                  </Grid>
-                  <Grid item xs={6}>
-                    <Typography variant="body2" color="text.secondary" noWrap>
-                      <Typography component="span" sx={{ fontWeight: "bold" }}>
-                        Difficulty:
-                      </Typography>{" "}
-                      <span
-                        style={{
-                          backgroundColor: getDifficultyColor(
-                            exercise.difficulty
-                          ),
-                          color: "white",
-                          padding: "2px 4px",
-                          borderRadius: "4px",
-                        }}
-                      >
-                        {formatDifficulty(exercise.difficulty)}
-                      </span>
-                    </Typography>
-                  </Grid>
-                </Grid>
-                <Typography variant="body2" color="text.secondary" mt={1}>
-                  <Typography component="span" sx={{ fontWeight: "bold" }}>
-                    Instructions:
-                  </Typography>{" "}
-                  {exercise.instructions.split(". ")[0]}.
-                </Typography>
-              </CardContent>
-            </Card>
-          </Grid>
-        ))}
+        {tabIndex === 0
+          ? filteredExercises.map((exercise) => renderExerciseCard(exercise))
+          : favorites.map((exercise) => renderExerciseCard(exercise, true))}
       </Grid>
     </Container>
   );
