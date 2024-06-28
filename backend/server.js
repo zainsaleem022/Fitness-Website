@@ -6,6 +6,7 @@ const {
 const userRoutes = require("./routes/userRoutes");
 const { connectDB } = require("./database");
 const cors = require("cors");
+const path = require("path");
 // Load environment variables from .env file
 require("dotenv").config();
 // Connect to MongoDB
@@ -20,6 +21,18 @@ app.use(express.json()); //to accept JSON data
 
 // Routes
 app.use("/bfit", userRoutes);
+
+// --------------------------------------------------production code------------------------------------------------------------
+// Serve static files from the React frontend app
+if (process.env.NODE_ENV === "production") {
+  app.use(express.static(path.join(__dirname, "../frontend/build")));
+
+  app.get("*", (req, res) => {
+    res.sendFile(path.join(__dirname, "../frontend/build", "index.html"));
+  });
+}
+
+// --------------------------------------------------production code------------------------------------------------------------
 
 // Error handling middleware
 app.use(notFound);

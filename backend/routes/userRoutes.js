@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const Workout = require("../models/WorkOutModel");
-const ExcerciseLib=require("../models/ExcerciseLibraryModel") // Import the Workout model
+const ExcerciseLib = require("../models/ExcerciseLibraryModel"); // Import the Workout model
 
 router.get("/", (req, res) => {
   res.send("Welcome to the home page!");
@@ -104,7 +104,7 @@ router.delete("/goalSetting/:id", async (req, res) => {
 router.post("/favorites", async (req, res) => {
   try {
     const exercise = new ExcerciseLib(req.body);
-    console.log(exercise);
+    //console.log(exercise);
     await exercise.save();
     res.status(201).send(exercise);
   } catch (error) {
