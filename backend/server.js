@@ -22,6 +22,10 @@ app.use(express.json()); //to accept JSON data
 // Routes
 app.use("/bfit", userRoutes);
 
+// Root route
+app.get("/", (req, res) => {
+  res.send("Hello World");
+});
 // --------------------------------------------------production code------------------------------------------------------------
 // Serve static files from the React frontend app
 // if (process.env.NODE_ENV === "production") {
