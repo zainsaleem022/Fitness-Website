@@ -22,10 +22,6 @@ app.use(express.json()); //to accept JSON data
 // Routes
 app.use("/bfit", userRoutes);
 
-// app.get("https://excercise-tracker-server.vercel.app/", (req, res) => {
-//   res.send("hello world");
-// });
-
 // --------------------------------------------------production code------------------------------------------------------------
 // Serve static files from the React frontend app
 if (process.env.NODE_ENV === "production") {
